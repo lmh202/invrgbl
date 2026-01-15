@@ -253,10 +253,10 @@ class CameraData(object):
                 os.path.join(self.data_path, "sky_masks", f"{t:03d}_{self.cam_id}.png")
             )
             albedo_filepaths.append(
-                os.path.join(self.data_path, "albedo_rgbx", f"{t:03d}_{self.cam_id}.jpg")
+                os.path.join(self.data_path, "albedo_ouroboros", f"{t:03d}_{self.cam_id}.jpg")
             )
             roughness_filepaths.append(
-                os.path.join(self.data_path, "rough_rgbx", f"{t:03d}_{self.cam_id}.jpg")
+                os.path.join(self.data_path, "rough_ouroboros", f"{t:03d}_{self.cam_id}.jpg")
             )
             shading_filepaths.append(
                 os.path.join(self.data_path, "visibility", f"{t:03d}_{self.cam_id}.jpg") #os.path.join(self.data_path, "shadow", f"{t:06d}.png") #
@@ -265,7 +265,7 @@ class CameraData(object):
                 os.path.join(self.data_path, "intensity", f"{t:03d}_{self.cam_id}.npy") #os.path.join(self.data_path, "intensity", f"{t:03d}_{self.cam_id}.npy")
             )
             normal_filepaths.append(
-                os.path.join(self.data_path, "normals/normal_npy", f"{t:03d}_{self.cam_id}_pred.npy")
+                os.path.join(self.data_path, "normal_ouroboros/normal_npy", f"{t:03d}_{self.cam_id}_pred.npy")
             )
         self.intensity_filepaths = np.array(intensity_filepaths)
         self.albedo_filepaths = np.array(albedo_filepaths)

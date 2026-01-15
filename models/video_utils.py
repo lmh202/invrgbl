@@ -308,11 +308,15 @@ def render(
                 ssim_scores.append(ssim_score)
                 lpipss.append(lpips.item())
 
-                lidar_mask = (image_infos['intensity_images'] > 5e-2)
-                rendered_intensity_ = results["rendered_intensity"] * lidar_mask
-                intensity_images = image_infos['intensity_images'] * lidar_mask
-                RMSE = torch.sqrt(torch.sum((rendered_intensity_ - intensity_images) ** 2)/lidar_mask.sum())
-                RMSEs.append(RMSE.item())
+                # intensity supervision is optional; some datasets disable it (load_intensity: False)
+                if ("intensity_images" in image_infos) and ("rendered_intensity" in results):
+                    lidar_mask = (image_infos['intensity_images'] > 5e-2)
+                    # 避免全零掩码导致除零
+                    if lidar_mask.any():
+                        rendered_intensity_ = results["rendered_intensity"] * lidar_mask
+                        intensity_images = image_infos['intensity_images'] * lidar_mask
+                        RMSE = torch.sqrt(torch.sum((rendered_intensity_ - intensity_images) ** 2)/lidar_mask.sum())
+                        RMSEs.append(RMSE.item())
                 # array = intensity_images.cpu().numpy() * 255
                 # array = array.astype(np.uint8)
                 # array_2d = array.squeeze()

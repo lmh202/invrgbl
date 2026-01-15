@@ -155,14 +155,14 @@ export GEO_OUT=/data0/geowizard_outputs/${SCENE}
 mkdir -p "$GEO_OUT"
 ```
 
-### 5.2 Run GeoWizard / RGB-X
+### 5.2 Run GeoWizard & RGB-X
 
 Feed the RGB frames into GeoWizard (replace the actual command with the one provided by the toolchain):
 
 ```shell
-python run_infer.py \
-    --input_dir /data0/data/waymo/processed/training/000/images \
-    --output_dir /data0/data/waymo/processed/training/000/normal_prior \
+python geowizard/geowizard/run_infer.py \
+    --input_dir /data0/data/waymo/processed/training/001/images \
+    --output_dir /data0/data/waymo/processed/training/001/normal_prior \
     --ensemble_size 3 \
     --denoise_steps 10 \
     --seed 0 \
@@ -170,6 +170,10 @@ python run_infer.py \
 ```
 
 GeoWizard writes per-frame PNG/EXR maps (e.g. `000_0_normal.png`, `000_0_albedo.png`, …). The filenames must embed the **frame index** (three digits) and **camera id** (0–4) so they can be matched later.
+
+```shell
+python rgbx/rgb2x/batch_rgb2x.py
+```
 
 ### 5.3 Repack to InvRGB+L layout
 

@@ -20,7 +20,7 @@ trainer:
     pbr: true
     incident_sample_num: 64 # number of incident light samples used when caching visibility (reduce to save VRAM)
     visibility_chunk_size: 200000 # number of gaussians traced per raytracing chunk
-    cache_visibility_on_cpu: true # move cached visibility tensors to CPU to free GPU memory
+    cache_visibility_on_cpu: false # move cached visibility tensors to CPU to free GPU memory
     visibility_dtype: float16 # precision for cached visibility tensors (converted back to fp32 for rendering)
   losses:
     rgb:
