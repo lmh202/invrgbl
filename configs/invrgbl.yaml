@@ -22,6 +22,16 @@ trainer:
     visibility_chunk_size: 200000 # number of gaussians traced per raytracing chunk
     cache_visibility_on_cpu: false # move cached visibility tensors to CPU to free GPU memory
     visibility_dtype: float16 # precision for cached visibility tensors (converted back to fp32 for rendering)
+    render_relight: 
+      enabled: True  # 开启relight渲染
+      light_directions:  # 定义不同的光照方向
+        - [0, -1, 0]  # 顶光
+        - [1, 0, 0]   # 侧光
+        - [0, 0, 1]   # 前光
+      light_intensities:  [1.0, 0.8, 0.6]  # 不同的光照强度
+    vis_lidar: False
+    vis_sky: False
+    vis_error: False
   losses:
     rgb:
       w: 0.8

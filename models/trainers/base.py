@@ -300,11 +300,23 @@ class BasicTrainer(nn.Module):
                                                             sample_num-1) #-1 TODO
 
                     if sun_direction is not None:
-                        sun_direction = sun_direction
-                        sun_direction = sun_direction/sun_direction.norm()
-                        sun_direction = sun_direction.repeat(incident_dirs.shape[0],1,1).to(device=incident_dirs.device)
-                        incident_dirs = torch.concat([sun_direction,incident_dirs], dim=1)
-                        incident_areas = torch.concat([incident_areas[:,0,:].unsqueeze(1),incident_areas], dim=1)
+                        # Normalize sun direction (use a local variable to avoid modifying the original)
+                        sun_dir_normalized = sun_direction / sun_direction.norm()
+                        # Expand to match incident_dirs shape: (chunk_size, 1, 3)
+                        sun_dir_expanded = sun_dir_normalized.view(1, 1, 3).expand(incident_dirs.shape[0], 1, 3).to(device=incident_dirs.device)
+                        incident_dirs = torch.concat([sun_dir_expanded, incident_dirs], dim=1)
+                        incident_areas = torch.concat([incident_areas[:,0,:].unsqueeze(1), incident_areas], dim=1)
+                        # Debug: log first chunk's sun direction
+                        if offset == 0:
+                            import logging
+                            logger = logging.getLogger()
+                            logger.debug(f"Added sun_direction to incident_dirs (first chunk): {sun_dir_expanded[0, 0].cpu().numpy()}")
+                    else:
+                        # Debug: log when sun_direction is None
+                        if offset == 0:
+                            import logging
+                            logger = logging.getLogger()
+                            logger.warning("sun_direction is None in update_visibility!")
 
 
                     trace_results = raytracer.trace_visibility(
@@ -546,6 +558,12 @@ class BasicTrainer(nn.Module):
         if (self.step > self.freeze_step) and (self.step % 100 == 1):
             update = random.random() < 0.01   
         
+        # Log sun_direction for debugging
+        if sun_direction is not None:
+            import logging
+            logger = logging.getLogger()
+            logger.debug(f"update_visibility called with sun_direction: {sun_direction.cpu().numpy()}, update={update}")
+        
         self.update_visibility(update=update, sun_direction=sun_direction)
 
 
@@ -684,15 +702,20 @@ class BasicTrainer(nn.Module):
                             'rendered_sun_visibility':rendered_sun_visibility,
                             'incident_sun_light':incident_sun_light,
                             })
+                
+                # Use PBR result for final RGB (not original rendered_rgb)
+                # This ensures relighting effects are visible in the final output
+                final_rgb = rendered_pbr
 
             else:
                 assert renders.shape[-1] == 4, f"Must render rgb, depth and alpha"
                 rendered_rgb, rendered_depth = torch.split(renders, [3, 1], dim=-1)
+                final_rgb = rendered_rgb
             
             if not return_info:
-                return torch.clamp(rendered_rgb, max=1.0), rendered_depth, alphas[..., None]
+                return torch.clamp(final_rgb, max=1.0), rendered_depth, alphas[..., None]
             else:
-                return torch.clamp(rendered_rgb, max=1.0), rendered_depth, alphas[..., None], info
+                return torch.clamp(final_rgb, max=1.0), rendered_depth, alphas[..., None], info
         
         # render rgb and opacity
         rgb, depth, opacity, self.info = render_fn(return_info=True)

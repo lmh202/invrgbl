@@ -224,6 +224,13 @@ def main(args):
         # "DeformableNodes_depths",
         # "SMPLNodes_depths",
         # "mask"
+        "rendered_albedos",        # 反照率
+        "rendered_normals",        # 法线
+        "rendered_roughness",      # 粗糙度
+        "rendered_reflectivity",   # 反射率
+        "rendered_sun_visibility", # 太阳可见性
+        "rendered_pbr",            # PBR渲染结果
+        "diffuse_light",           # 漫反射光
     ]
     if cfg.render.vis_lidar:
         render_keys.insert(0, "lidar_on_images")
